@@ -1,6 +1,7 @@
 package com.xiaobao.gmall.service;
 
 import com.xiaobao.gmall.bean.BaseAttrInfo;
+import com.xiaobao.gmall.bean.BaseAttrValue;
 import com.xiaobao.gmall.bean.BaseCatalog1;
 import com.xiaobao.gmall.bean.BaseCatalog2;
 import com.xiaobao.gmall.bean.BaseCatalog3;
@@ -38,4 +39,24 @@ public interface ManageService {
      * @return  对应的平台属性集合
      */
     List<BaseAttrInfo> getAttrList(String catalog3Id);
+
+    /**
+     * 保存或修改平台属性
+     * @param baseAttrInfo
+     */
+    void saveAttrInfo(BaseAttrInfo baseAttrInfo);
+
+    /**
+     * 修改平台属性值回显
+     * @param attrId
+     * @return
+     */
+    List<BaseAttrValue> getAttrValueList(String attrId);
+
+    /**
+     * 获取主键对应的平台属性
+     * @param attrId
+     * @return
+     */
+    BaseAttrInfo getAttrInfo(String attrId);
 }

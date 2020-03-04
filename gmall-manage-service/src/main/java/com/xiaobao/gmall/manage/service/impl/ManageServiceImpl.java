@@ -12,7 +12,9 @@ import com.xiaobao.gmall.manage.mapper.BaseCatalog1Mapper;
 import com.xiaobao.gmall.manage.mapper.BaseCatalog2Mapper;
 import com.xiaobao.gmall.manage.mapper.BaseCatalog3Mapper;
 import com.xiaobao.gmall.service.ManageService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -56,5 +58,46 @@ public class ManageServiceImpl implements ManageService {
         BaseAttrInfo baseAttrInfo = new BaseAttrInfo();
         baseAttrInfo.setCatalog3Id(catalog3Id);
         return attrInfoMapper.select(baseAttrInfo);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void saveAttrInfo(BaseAttrInfo baseAttrInfo) {
+        if (StringUtils.isNotBlank(baseAttrInfo.getId())){
+            attrInfoMapper.updateByPrimaryKeySelective(baseAttrInfo);
+        }else {
+            attrInfoMapper.insertSelective(baseAttrInfo);
+        }
+        //先清空所有的值
+        BaseAttrValue baseAttrValueDel = new BaseAttrValue();
+        baseAttrValueDel.setAttrId(baseAttrInfo.getId());
+        attrValueMapper.delete(baseAttrValueDel);
+        //重新添加
+        List<BaseAttrValue> attrValueList = baseAttrInfo.getAttrValueList();
+        if (attrValueList != null && attrValueList.size() > 0){
+            for (BaseAttrValue baseAttrValue : attrValueList) {
+                baseAttrValue.setAttrId(baseAttrInfo.getId());
+                attrValueMapper.insertSelective(baseAttrValue);
+            }
+        }
+    }
+
+    @Override
+    public List<BaseAttrValue> getAttrValueList(String attrId) {
+        BaseAttrValue baseAttrValue = new BaseAttrValue();
+        baseAttrValue.setAttrId(attrId);
+        return attrValueMapper.select(baseAttrValue);
+    }
+
+    @Override
+    public BaseAttrInfo getAttrInfo(String attrId) {
+        BaseAttrInfo baseAttrInfo = attrInfoMapper.selectByPrimaryKey(attrId);
+        if (baseAttrInfo != null){
+            BaseAttrValue baseAttrValue = new BaseAttrValue();
+            baseAttrValue.setAttrId(baseAttrInfo.getId());
+            List<BaseAttrValue> attrValues = attrValueMapper.select(baseAttrValue);
+            baseAttrInfo.setAttrValueList(attrValues);
+        }
+        return baseAttrInfo;
     }
 }

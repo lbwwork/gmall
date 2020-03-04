@@ -2,12 +2,14 @@ package com.xiaobao.gmall.manage.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.xiaobao.gmall.bean.BaseAttrInfo;
+import com.xiaobao.gmall.bean.BaseAttrValue;
 import com.xiaobao.gmall.bean.BaseCatalog1;
 import com.xiaobao.gmall.bean.BaseCatalog2;
 import com.xiaobao.gmall.bean.BaseCatalog3;
 import com.xiaobao.gmall.service.ManageService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -46,5 +48,22 @@ public class ManageController {
     @ResponseBody
     public List<BaseAttrInfo> attrInfoList(String catalog3Id){
         return manageService.getAttrList(catalog3Id);
+    }
+
+    @RequestMapping("saveAttrInfo")
+    @ResponseBody
+    public void saveAttrInfo(@RequestBody BaseAttrInfo baseAttrInfo){
+        manageService.saveAttrInfo(baseAttrInfo);
+    }
+
+    //    @RequestMapping("getAttrValueList")
+//    @ResponseBody
+//    private List<BaseAttrValue> getAttrValueList(String attrId){
+//        return manageService.getAttrValueList(attrId);
+//    }
+    @RequestMapping("getAttrValueList")
+    @ResponseBody
+    private List<BaseAttrValue> getAttrValueList(String attrId){
+        return manageService.getAttrInfo(attrId).getAttrValueList();
     }
 }
