@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+        "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.xiaobao.gmall.manage.mapper.BaseAttrValueMapper">
+    <insert id="insertAttrValues" parameterType="java.util.List">
+        INSERT INTO
+            base_attr_value
+            (id,value_name,attr_id)
+        VALUES
+        <foreach collection="list" item="attrValue" separator=",">
+            (#{attrValue.id},#{attrValue.valueName},#{attrValue.attrId})
+        </foreach>
+    </insert>
+</mapper>

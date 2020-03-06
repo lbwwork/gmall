@@ -77,8 +77,8 @@ public class ManageServiceImpl implements ManageService {
         if (attrValueList != null && attrValueList.size() > 0){
             for (BaseAttrValue baseAttrValue : attrValueList) {
                 baseAttrValue.setAttrId(baseAttrInfo.getId());
-                attrValueMapper.insertSelective(baseAttrValue);
             }
+            attrValueMapper.insertAttrValues(attrValueList);
         }
     }
 
@@ -100,4 +100,6 @@ public class ManageServiceImpl implements ManageService {
         }
         return baseAttrInfo;
     }
+
+
 }
