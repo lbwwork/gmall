@@ -6,11 +6,13 @@ import com.xiaobao.gmall.bean.BaseAttrValue;
 import com.xiaobao.gmall.bean.BaseCatalog1;
 import com.xiaobao.gmall.bean.BaseCatalog2;
 import com.xiaobao.gmall.bean.BaseCatalog3;
+import com.xiaobao.gmall.bean.SpuInfo;
 import com.xiaobao.gmall.manage.mapper.BaseAttrInfoMapper;
 import com.xiaobao.gmall.manage.mapper.BaseAttrValueMapper;
 import com.xiaobao.gmall.manage.mapper.BaseCatalog1Mapper;
 import com.xiaobao.gmall.manage.mapper.BaseCatalog2Mapper;
 import com.xiaobao.gmall.manage.mapper.BaseCatalog3Mapper;
+import com.xiaobao.gmall.manage.mapper.SpuInfoMapper;
 import com.xiaobao.gmall.service.ManageService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +36,8 @@ public class ManageServiceImpl implements ManageService {
     private BaseAttrInfoMapper attrInfoMapper;
     @Autowired
     private BaseAttrValueMapper attrValueMapper;
+    @Autowired
+    private SpuInfoMapper spuInfoMapper;
     @Override
     public List<BaseCatalog1> getCatalog1() {
         return catalog1Mapper.selectAll();
@@ -99,6 +103,13 @@ public class ManageServiceImpl implements ManageService {
             baseAttrInfo.setAttrValueList(attrValues);
         }
         return baseAttrInfo;
+    }
+
+    @Override
+    public List<SpuInfo> spuList(String catalog3Id) {
+        SpuInfo spuInfo = new SpuInfo();
+        spuInfo.setCatalog3Id(catalog3Id);
+        return spuInfoMapper.select(spuInfo);
     }
 
 

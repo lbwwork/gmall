@@ -5,6 +5,7 @@ import com.xiaobao.gmall.bean.BaseAttrValue;
 import com.xiaobao.gmall.bean.BaseCatalog1;
 import com.xiaobao.gmall.bean.BaseCatalog2;
 import com.xiaobao.gmall.bean.BaseCatalog3;
+import com.xiaobao.gmall.bean.SpuInfo;
 
 import java.util.List;
 
@@ -59,4 +60,11 @@ public interface ManageService {
      * @return
      */
     BaseAttrInfo getAttrInfo(String attrId);
+
+    /**
+     * 根据三级分类id获取spu集合
+     * @param catalog3Id
+     * @return
+     */
+    List<SpuInfo> spuList(String catalog3Id);
 }
