@@ -26,29 +26,48 @@ public class FileUploadController {
      */
     @Value("${fileServer.url}")
     private String fileUrl;
+    private static TrackerClient trackerClient;
+
+    static {
+        try {
+             ClientGlobal.init("tracker.conf");
+            trackerClient = new TrackerClient();
+        } catch (IOException | MyException e) {
+            System.err.println("获取配置文件出错" + e);
+        }
+    }
     /**
      * 文件上传
      * @param file 上传的文件，springMvc
      * @return  文件在文件服务器的路径
      */
     @RequestMapping("fileUpload")
-    public String fileUpload(MultipartFile file) throws IOException, MyException {
+    public String fileUpload(MultipartFile file){
         StringBuilder imgUrl = new StringBuilder(fileUrl);
         if (file != null){
-            String confFile = this.getClass().getResource("/tracker.conf").getFile();
-            ClientGlobal.init(confFile);
-            TrackerClient trackerClient = new TrackerClient();
             //获取连接
-            TrackerServer trackerServer = trackerClient.getTrackerServer();
+            TrackerServer trackerServer = null;
+            try {
+                trackerServer = trackerClient.getTrackerServer();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             StorageClient storageClient = new StorageClient(trackerServer,null);
             String orginalFilename=file.getOriginalFilename();
             String extName = StringUtils.substringAfterLast(orginalFilename, ".");
-            String[] upload_file = storageClient.upload_appender_file(file.getBytes(), extName, null);
-            for (int i = 0; i < upload_file.length; i++) {
-                String path = upload_file[i];
-                imgUrl.append("/").append(path);
+            String[] upload_file = new String[2];
+            try {
+                upload_file = storageClient.upload_appender_file(file.getBytes(), extName, null);
+                if (upload_file == null || upload_file.length != 2){
+                    System.err.println("向FastDFS上传文件失败");
+                }else {
+                    System.out.println("向FastDFS上传文件成功");
+                }
+            } catch (IOException | MyException e) {
+                e.printStackTrace();
             }
         }
         return imgUrl.toString();
     }
+
 }
