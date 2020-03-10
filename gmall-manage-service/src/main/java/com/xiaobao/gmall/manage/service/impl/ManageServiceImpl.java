@@ -6,13 +6,21 @@ import com.xiaobao.gmall.bean.BaseAttrValue;
 import com.xiaobao.gmall.bean.BaseCatalog1;
 import com.xiaobao.gmall.bean.BaseCatalog2;
 import com.xiaobao.gmall.bean.BaseCatalog3;
+import com.xiaobao.gmall.bean.BaseSaleAttr;
+import com.xiaobao.gmall.bean.SpuImage;
 import com.xiaobao.gmall.bean.SpuInfo;
+import com.xiaobao.gmall.bean.SpuSaleAttr;
+import com.xiaobao.gmall.bean.SpuSaleAttrValue;
 import com.xiaobao.gmall.manage.mapper.BaseAttrInfoMapper;
 import com.xiaobao.gmall.manage.mapper.BaseAttrValueMapper;
 import com.xiaobao.gmall.manage.mapper.BaseCatalog1Mapper;
 import com.xiaobao.gmall.manage.mapper.BaseCatalog2Mapper;
 import com.xiaobao.gmall.manage.mapper.BaseCatalog3Mapper;
+import com.xiaobao.gmall.manage.mapper.BaseSaleAttrMapper;
+import com.xiaobao.gmall.manage.mapper.SpuImageMapper;
 import com.xiaobao.gmall.manage.mapper.SpuInfoMapper;
+import com.xiaobao.gmall.manage.mapper.SpuSaleAttrMapper;
+import com.xiaobao.gmall.manage.mapper.SpuSaleAttrValueMapper;
 import com.xiaobao.gmall.service.ManageService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +46,14 @@ public class ManageServiceImpl implements ManageService {
     private BaseAttrValueMapper attrValueMapper;
     @Autowired
     private SpuInfoMapper spuInfoMapper;
+    @Autowired
+    private BaseSaleAttrMapper saleAttrMapper;
+    @Autowired
+    private SpuImageMapper spuImageMapper;
+    @Autowired
+    private SpuSaleAttrMapper spuSaleAttrMapper;
+    @Autowired
+    private SpuSaleAttrValueMapper spuSaleAttrValueMapper;
     @Override
     public List<BaseCatalog1> getCatalog1() {
         return catalog1Mapper.selectAll();
@@ -110,6 +126,54 @@ public class ManageServiceImpl implements ManageService {
         SpuInfo spuInfo = new SpuInfo();
         spuInfo.setCatalog3Id(catalog3Id);
         return spuInfoMapper.select(spuInfo);
+    }
+
+    @Override
+    public List<BaseSaleAttr> getBaseSaleAttrList() {
+        return saleAttrMapper.selectAll();
+    }
+
+    @Override
+    public void saveSpuInfo(SpuInfo spuInfo) {
+        if (StringUtils.isBlank(spuInfo.getId())){
+            spuInfo.setId(null);
+            spuInfoMapper.insertSelective(spuInfo);
+        }else {
+            spuInfoMapper.updateByPrimaryKeySelective(spuInfo);
+        }
+        //图片先删后加
+        SpuImage spuImage = new SpuImage();
+        spuImage.setSpuId(spuInfo.getId());
+        spuImageMapper.delete(spuImage);
+        List<SpuImage> spuImageList = spuInfo.getSpuImageList();
+        for (SpuImage image : spuImageList) {
+            image.setSpuId(spuInfo.getId());
+            image.setId(null);
+        }
+        spuImageMapper.insertSpuImages(spuImageList);
+        // 销售属性 删除，插入
+        SpuSaleAttr spuSaleAttr = new SpuSaleAttr();
+        spuSaleAttr.setSpuId(spuInfo.getId());
+        spuSaleAttrMapper.delete(spuSaleAttr);
+
+        // 销售属性值 删除，插入
+        SpuSaleAttrValue spuSaleAttrValue = new SpuSaleAttrValue();
+        spuSaleAttrValue.setSpuId(spuInfo.getId());
+        spuSaleAttrValueMapper.delete(spuSaleAttrValue);
+
+        List<SpuSaleAttr> spuSaleAttrList = spuInfo.getSpuSaleAttrList();
+        for (SpuSaleAttr saleAttr : spuSaleAttrList) {
+            saleAttr.setId(null);
+            saleAttr.setSpuId(spuInfo.getId());
+            spuSaleAttrMapper.insertSelective(saleAttr);
+            List<SpuSaleAttrValue> spuSaleAttrValueList = saleAttr.getSpuSaleAttrValueList();
+            for (SpuSaleAttrValue saleAttrValue : spuSaleAttrValueList) {
+                saleAttrValue.setId(null);
+                saleAttrValue.setSpuId(spuInfo.getId());
+                saleAttrValue.setSaleAttrId(saleAttr.getId());
+            }
+            spuSaleAttrValueMapper.insertSpuSaleAttrValue(spuSaleAttrValueList);
+        }
     }
 
 

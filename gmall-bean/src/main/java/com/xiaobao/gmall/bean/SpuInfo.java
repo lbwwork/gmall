@@ -4,7 +4,9 @@ import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Transient;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * 商品spu实体类
@@ -23,7 +25,27 @@ public class SpuInfo implements Serializable {
     private String description;
 
     @Column
-    private  String catalog3Id;
+    private String catalog3Id;
+    @Transient
+    private List<SpuSaleAttr> spuSaleAttrList;
+    @Transient
+    private List<SpuImage> spuImageList;
+
+    public List<SpuSaleAttr> getSpuSaleAttrList() {
+        return spuSaleAttrList;
+    }
+
+    public void setSpuSaleAttrList(List<SpuSaleAttr> spuSaleAttrList) {
+        this.spuSaleAttrList = spuSaleAttrList;
+    }
+
+    public List<SpuImage> getSpuImageList() {
+        return spuImageList;
+    }
+
+    public void setSpuImageList(List<SpuImage> spuImageList) {
+        this.spuImageList = spuImageList;
+    }
 
     public String getId() {
         return id;

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+        "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.xiaobao.gmall.manage.mapper.SpuSaleAttrMapper">
+    <insert id="insertSpuSaleAttrs" parameterType="java.util.List">
+        INSERT INTO
+            spu_image
+            (id,spu_id,sale_attr_id,sale_attr_name)
+        VALUES
+        <foreach collection="list" item="spuAttr" separator=",">
+            (#{spuAttr.id},#{spuAttr.spuId},#{spuAttr.saleAttrId},#{spuAttr.saleAttrValueName})
+        </foreach>
+    </insert>
+</mapper>

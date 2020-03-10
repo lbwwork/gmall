@@ -6,6 +6,7 @@ import com.xiaobao.gmall.bean.BaseAttrValue;
 import com.xiaobao.gmall.bean.BaseCatalog1;
 import com.xiaobao.gmall.bean.BaseCatalog2;
 import com.xiaobao.gmall.bean.BaseCatalog3;
+import com.xiaobao.gmall.bean.BaseSaleAttr;
 import com.xiaobao.gmall.bean.SpuInfo;
 import com.xiaobao.gmall.service.ManageService;
 import org.springframework.stereotype.Controller;
@@ -62,5 +63,15 @@ public class ManageController {
     public List<BaseAttrValue> getAttrValueList(String attrId){
         return manageService.getAttrInfo(attrId).getAttrValueList();
     }
-
+    @RequestMapping("baseSaleAttrList")
+    @ResponseBody
+    public List<BaseSaleAttr> getBaseSaleAttrList(){
+        return manageService.getBaseSaleAttrList();
+    }
+    @RequestMapping("saveSpuInfo")
+    @ResponseBody
+    public String saveSpuInfo(@RequestBody SpuInfo spuInfo){
+        manageService.saveSpuInfo(spuInfo);
+        return "OK";
+    }
 }
