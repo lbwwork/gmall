@@ -6,7 +6,10 @@ import com.xiaobao.gmall.bean.BaseCatalog1;
 import com.xiaobao.gmall.bean.BaseCatalog2;
 import com.xiaobao.gmall.bean.BaseCatalog3;
 import com.xiaobao.gmall.bean.BaseSaleAttr;
+import com.xiaobao.gmall.bean.SkuInfo;
+import com.xiaobao.gmall.bean.SpuImage;
 import com.xiaobao.gmall.bean.SpuInfo;
+import com.xiaobao.gmall.bean.SpuSaleAttr;
 
 import java.util.List;
 
@@ -80,4 +83,24 @@ public interface ManageService {
      * @param spuInfo
      */
     void saveSpuInfo(SpuInfo spuInfo);
+
+    /**
+     * 根据spuId获取spuSaleAttr集合
+     * @param spuId
+     * @return
+     */
+    List<SpuSaleAttr> spuSaleAttrList(String spuId);
+
+    /**
+     * 根据spuId获取SpuImage集合
+     * @param supId
+     * @return
+     */
+    List<SpuImage> spuImageList(String supId);
+
+    /**
+     * 保存skuInfo
+     * @param skuInfo
+     */
+    void saveSkuInfo(SkuInfo skuInfo);
 }
