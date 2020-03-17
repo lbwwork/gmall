@@ -248,5 +248,10 @@ public class ManageServiceImpl implements ManageService {
         }
     }
 
+    @Override
+    public SkuInfo getSkuInfo(String skuId) {
+        return skuInfoMapper.selectByPrimaryKey(skuId);
+    }
+
 
 }
