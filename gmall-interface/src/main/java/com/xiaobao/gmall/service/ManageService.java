@@ -6,6 +6,7 @@ import com.xiaobao.gmall.bean.BaseCatalog1;
 import com.xiaobao.gmall.bean.BaseCatalog2;
 import com.xiaobao.gmall.bean.BaseCatalog3;
 import com.xiaobao.gmall.bean.BaseSaleAttr;
+import com.xiaobao.gmall.bean.SkuImage;
 import com.xiaobao.gmall.bean.SkuInfo;
 import com.xiaobao.gmall.bean.SpuImage;
 import com.xiaobao.gmall.bean.SpuInfo;
@@ -110,4 +111,11 @@ public interface ManageService {
      * @return
      */
     SkuInfo getSkuInfo(String skuId);
+
+    /**
+     * 根据skuId获取skuImage
+     * @param skuId
+     * @return
+     */
+    List<SkuImage> getSkuImageList(String skuId);
 }

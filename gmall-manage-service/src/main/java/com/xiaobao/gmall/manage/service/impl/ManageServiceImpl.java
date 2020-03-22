@@ -158,6 +158,7 @@ public class ManageServiceImpl implements ManageService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void saveSpuInfo(SpuInfo spuInfo) {
         if (StringUtils.isBlank(spuInfo.getId())){
             spuInfo.setId(null);
@@ -250,7 +251,18 @@ public class ManageServiceImpl implements ManageService {
 
     @Override
     public SkuInfo getSkuInfo(String skuId) {
-        return skuInfoMapper.selectByPrimaryKey(skuId);
+        SkuInfo skuInfo = skuInfoMapper.selectByPrimaryKey(skuId);
+        //获取图片列表
+        List<SkuImage> skuImages = getSkuImageList(skuId);
+        skuInfo.setSkuImageList(skuImages);
+        return skuInfo;
+    }
+
+    @Override
+    public List<SkuImage> getSkuImageList(String skuId) {
+        SkuImage skuImage = new SkuImage();
+        skuImage.setSkuId(skuId);
+        return skuImageMapper.select(skuImage);
     }
 
 

@@ -4,7 +4,7 @@
 <mapper namespace="com.xiaobao.gmall.manage.mapper.SpuSaleAttrValueMapper">
     <insert id="insertSpuSaleAttrValue" parameterType="java.util.List">
         INSERT INTO
-            spu_image
+            spu_sale_attr_value
             (id,spu_id,sale_attr_id,sale_attr_value_name)
         VALUES
         <foreach collection="list" item="spuAttrValue" separator=",">

@@ -55,13 +55,17 @@ public class FileUploadController {
             StorageClient storageClient = new StorageClient(trackerServer,null);
             String orginalFilename=file.getOriginalFilename();
             String extName = StringUtils.substringAfterLast(orginalFilename, ".");
-            String[] upload_file = new String[2];
+            String[] uploadFile = new String[2];
             try {
-                upload_file = storageClient.upload_appender_file(file.getBytes(), extName, null);
-                if (upload_file == null || upload_file.length != 2){
+                uploadFile = storageClient.upload_appender_file(file.getBytes(), extName, null);
+                if (uploadFile == null || uploadFile.length != 2){
                     System.err.println("向FastDFS上传文件失败");
                 }else {
                     System.out.println("向FastDFS上传文件成功");
+                    imgUrl.append("/");
+                    imgUrl.append(uploadFile[0]);
+                    imgUrl.append("/");
+                    imgUrl.append(uploadFile[1]);
                 }
             } catch (IOException | MyException e) {
                 e.printStackTrace();

@@ -115,14 +115,9 @@
 
 						<div class="box-lh-one">
 							<ul>
- 
- 								<li><img src="/img/59ded62eN64a9784c.jpg" /></li>
-								<li><img src="/img/59ded626Ne3c69b70.jpg" /></li>
-								<li><img src="/img/59ded626N7c4cb0a3.jpg" /></li>
-								<li><img src="/img/59ded626Ne3c69b70.jpg" /></li>
-								<li><img src="/img/59ded62dN7e28abc5%20(1).jpg" /></li>
- 
-								 
+ 								<li th:each="skuImage: ${skuInfo.skuImageList}">
+									<img th:src="${skuImage.imgUrl}" src="/img/59ded62eN64a9784c.jpg" />
+								</li>
 							</ul>
 						</div>
 						<div id="left">
