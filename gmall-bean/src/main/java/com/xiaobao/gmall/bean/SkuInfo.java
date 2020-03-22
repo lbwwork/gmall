@@ -46,6 +46,17 @@ public class SkuInfo implements Serializable{
     @Transient
     List<SkuSaleAttrValue> skuSaleAttrValueList;
 
+    @Transient
+    List<SpuSaleAttr> spuSaleAttrs;
+
+    public List<SpuSaleAttr> getSpuSaleAttrs() {
+        return spuSaleAttrs;
+    }
+
+    public void setSpuSaleAttrs(List<SpuSaleAttr> spuSaleAttrs) {
+        this.spuSaleAttrs = spuSaleAttrs;
+    }
+
     public String getId() {
         return id;
     }
