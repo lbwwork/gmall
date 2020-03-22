@@ -8,6 +8,7 @@ import com.xiaobao.gmall.bean.BaseCatalog3;
 import com.xiaobao.gmall.bean.BaseSaleAttr;
 import com.xiaobao.gmall.bean.SkuImage;
 import com.xiaobao.gmall.bean.SkuInfo;
+import com.xiaobao.gmall.bean.SkuSaleAttrValue;
 import com.xiaobao.gmall.bean.SpuImage;
 import com.xiaobao.gmall.bean.SpuInfo;
 import com.xiaobao.gmall.bean.SpuSaleAttr;
@@ -125,4 +126,11 @@ public interface ManageService {
      * @return
      */
     List<SpuSaleAttr> getSpuSaleAttrListCheckBySku(SkuInfo skuInfo);
+
+    /**
+     * xx
+     * @param spuId
+     * @return
+     */
+    List<SkuSaleAttrValue> getSkuSaleAttrValueListBySpu(String spuId);
 }
