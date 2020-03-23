@@ -15,6 +15,7 @@ import com.xiaobao.gmall.bean.SpuImage;
 import com.xiaobao.gmall.bean.SpuInfo;
 import com.xiaobao.gmall.bean.SpuSaleAttr;
 import com.xiaobao.gmall.bean.SpuSaleAttrValue;
+import com.xiaobao.gmall.config.RedisUtil;
 import com.xiaobao.gmall.manage.mapper.BaseAttrInfoMapper;
 import com.xiaobao.gmall.manage.mapper.BaseAttrValueMapper;
 import com.xiaobao.gmall.manage.mapper.BaseCatalog1Mapper;
@@ -33,6 +34,7 @@ import com.xiaobao.gmall.service.ManageService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import redis.clients.jedis.Jedis;
 
 import java.util.List;
 
@@ -70,6 +72,8 @@ public class ManageServiceImpl implements ManageService {
     private SkuSaleAttrValueMapper skuSaleAttrValueMapper;
     @Autowired
     private SkuImageMapper skuImageMapper;
+    @Autowired
+    private RedisUtil redisUtil;
     @Override
     public List<BaseCatalog1> getCatalog1() {
         return catalog1Mapper.selectAll();
@@ -251,6 +255,8 @@ public class ManageServiceImpl implements ManageService {
 
     @Override
     public SkuInfo getSkuInfo(String skuId) {
+        Jedis jedis = redisUtil.getJedis();
+        jedis.set("ok","成功");
         SkuInfo skuInfo = skuInfoMapper.selectByPrimaryKey(skuId);
         //获取图片列表
         List<SkuImage> skuImages = getSkuImageList(skuId);

@@ -8,7 +8,6 @@
         <version>1.0-SNAPSHOT</version>
         <relativePath />
     </parent>
-    <groupId>com.xiaobao.gmall</groupId>
     <artifactId>gmall-manage-web</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>gmall-manage-web</name>
