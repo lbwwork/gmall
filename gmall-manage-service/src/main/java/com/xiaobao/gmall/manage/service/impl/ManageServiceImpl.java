@@ -1,6 +1,7 @@
 package com.xiaobao.gmall.manage.service.impl;
 
 import com.alibaba.dubbo.config.annotation.Service;
+import com.alibaba.fastjson.JSON;
 import com.xiaobao.gmall.bean.BaseAttrInfo;
 import com.xiaobao.gmall.bean.BaseAttrValue;
 import com.xiaobao.gmall.bean.BaseCatalog1;
@@ -16,6 +17,7 @@ import com.xiaobao.gmall.bean.SpuInfo;
 import com.xiaobao.gmall.bean.SpuSaleAttr;
 import com.xiaobao.gmall.bean.SpuSaleAttrValue;
 import com.xiaobao.gmall.config.RedisUtil;
+import com.xiaobao.gmall.manage.constant.ManageConst;
 import com.xiaobao.gmall.manage.mapper.BaseAttrInfoMapper;
 import com.xiaobao.gmall.manage.mapper.BaseAttrValueMapper;
 import com.xiaobao.gmall.manage.mapper.BaseCatalog1Mapper;
@@ -255,10 +257,72 @@ public class ManageServiceImpl implements ManageService {
 
     @Override
     public SkuInfo getSkuInfo(String skuId) {
-        Jedis jedis = redisUtil.getJedis();
-        jedis.set("ok","成功");
+        //获取Jedis
+        Jedis jedis = null;
+        SkuInfo skuInfo = null;
+
+        try{
+            jedis = redisUtil.getJedis();
+            //判断缓存中是否有数据,如果有，从缓存中获取，如果没有，从数据库获取并放入缓存
+            String key = ManageConst.SKUINFO + skuId;
+            String skuJson = jedis.get(key);
+            //缓存中为空，
+            if (StringUtils.isBlank(skuJson)){
+                //试着加锁
+                System.out.println("缓存中没有数据");
+                //执行set命令  定义上锁的key
+                String skuLockKey = ManageConst.SKUINFO+skuId+ManageConst.SKULOCK_SUFFIX;
+                String lockKey = jedis.set(skuLockKey, "ok", "nx", "px", ManageConst.SKULOCK_BXPIRB_PX);
+                String OK = "OK";
+                if (OK.equals(lockKey)){
+                    //此时加锁成功
+                    skuInfo = getSkuInfoDB(skuId);
+                    String skuInfoJson = JSON.toJSONString(skuInfo);
+                    jedis.setex(key,ManageConst.TIMEOUT,skuInfoJson);
+                    System.out.println("从数据库中取出");
+                    jedis.del(lockKey);
+                    return skuInfo;
+                }else {
+                    //等待
+                    Thread.sleep(1000);
+                    getSkuInfo(skuId);
+                }
+            }else {
+                skuInfo = JSON.parseObject(skuJson, SkuInfo.class);
+                return skuInfo;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+
+        }
+//        try {
+//            jedis = redisUtil.getJedis();
+//            //判断缓存中是否有数据,如果有，从缓存中获取，如果没有，从数据库获取并放入缓存
+//            String key = ManageConst.SKUINFO + skuId;
+//            if (jedis.exists(key)){
+//                String skuJson = jedis.get(key);
+//                skuInfo = JSON.parseObject(skuJson, SkuInfo.class);
+//                System.out.println("从缓存中取出");
+//            }else {
+//                skuInfo = getSkuInfoDB(skuId);
+//                String skuInfoJson = JSON.toJSONString(skuInfo);
+//                jedis.setex(key,ManageConst.TIMEOUT,skuInfoJson);
+//                System.out.println("从数据库中取出");
+//            }
+//            return skuInfo;
+//        }catch (Exception e){
+//            e.printStackTrace();
+//        }finally {
+//            if (jedis != null){
+//                jedis.close();
+//            }
+//        }
+        return getSkuInfoDB(skuId);
+    }
+
+    private SkuInfo getSkuInfoDB(String skuId) {
         SkuInfo skuInfo = skuInfoMapper.selectByPrimaryKey(skuId);
-        //获取图片列表
         List<SkuImage> skuImages = getSkuImageList(skuId);
         skuInfo.setSkuImageList(skuImages);
         return skuInfo;
