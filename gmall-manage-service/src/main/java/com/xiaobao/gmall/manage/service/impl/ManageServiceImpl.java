@@ -34,6 +34,8 @@ import com.xiaobao.gmall.manage.mapper.SpuSaleAttrMapper;
 import com.xiaobao.gmall.manage.mapper.SpuSaleAttrValueMapper;
 import com.xiaobao.gmall.service.ManageService;
 import org.apache.commons.lang3.StringUtils;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import redis.clients.jedis.Jedis;
@@ -76,6 +78,8 @@ public class ManageServiceImpl implements ManageService {
     private SkuImageMapper skuImageMapper;
     @Autowired
     private RedisUtil redisUtil;
+    @Autowired
+    private RedissonClient redissonClient;
     @Override
     public List<BaseCatalog1> getCatalog1() {
         return catalog1Mapper.selectAll();
@@ -257,6 +261,37 @@ public class ManageServiceImpl implements ManageService {
 
     @Override
     public SkuInfo getSkuInfo(String skuId) {
+        return getSkuInfoByRedisson(skuId);
+    }
+
+    private SkuInfo getSkuInfoByRedisson(String skuId) {
+        //使用redisson调用getLock
+        RLock lock = redissonClient.getLock("youLock");
+        //加锁
+        lock.lock();
+        Jedis jedis = null;
+        SkuInfo skuInfo = null;
+        try{
+            jedis = redisUtil.getJedis();
+            String key = ManageConst.SKUINFO + skuId;
+            if (jedis.exists(key)){
+                String skuInfoJson = jedis.get(key);
+                skuInfo = JSON.parseObject(skuInfoJson,SkuInfo.class);
+            }else {
+                skuInfo = getSkuInfoDB(skuId);
+                String skuInfoJson = JSON.toJSONString(skuInfo);
+                jedis.set(key,skuInfoJson);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            jedis.close();
+        }
+        lock.unlock();
+        return skuInfo;
+    }
+
+    private SkuInfo getSkuInfoByJedis(String skuId) {
         //获取Jedis
         Jedis jedis = null;
         SkuInfo skuInfo = null;
@@ -273,8 +308,8 @@ public class ManageServiceImpl implements ManageService {
                 //执行set命令  定义上锁的key
                 String skuLockKey = ManageConst.SKUINFO+skuId+ManageConst.SKULOCK_SUFFIX;
                 String lockKey = jedis.set(skuLockKey, "ok", "nx", "px", ManageConst.SKULOCK_BXPIRB_PX);
-                String OK = "OK";
-                if (OK.equals(lockKey)){
+                String ok = "OK";
+                if (ok.equals(lockKey)){
                     //此时加锁成功
                     skuInfo = getSkuInfoDB(skuId);
                     String skuInfoJson = JSON.toJSONString(skuInfo);
@@ -294,30 +329,10 @@ public class ManageServiceImpl implements ManageService {
         }catch (Exception e){
             e.printStackTrace();
         }finally {
-
+            if(jedis != null){
+                jedis.close();
+            }
         }
-//        try {
-//            jedis = redisUtil.getJedis();
-//            //判断缓存中是否有数据,如果有，从缓存中获取，如果没有，从数据库获取并放入缓存
-//            String key = ManageConst.SKUINFO + skuId;
-//            if (jedis.exists(key)){
-//                String skuJson = jedis.get(key);
-//                skuInfo = JSON.parseObject(skuJson, SkuInfo.class);
-//                System.out.println("从缓存中取出");
-//            }else {
-//                skuInfo = getSkuInfoDB(skuId);
-//                String skuInfoJson = JSON.toJSONString(skuInfo);
-//                jedis.setex(key,ManageConst.TIMEOUT,skuInfoJson);
-//                System.out.println("从数据库中取出");
-//            }
-//            return skuInfo;
-//        }catch (Exception e){
-//            e.printStackTrace();
-//        }finally {
-//            if (jedis != null){
-//                jedis.close();
-//            }
-//        }
         return getSkuInfoDB(skuId);
     }
 
